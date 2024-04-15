@@ -15,4 +15,4 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az account show
+            az keyvault secret show --name "secret" --vault-name "gokulsecret" --query "value"
