@@ -93,3 +93,4 @@ jobs:
           done
 
           aws s3 cp $buildfile s3://${{ steps.vars.outputs.STABLE_BUILDS_METADATA_S3_BUCKET }}/${{ steps.vars.outputs.STABLE_BUILDS_METADATA_PATH }}/$buildfile
+        needs: Print-Details
