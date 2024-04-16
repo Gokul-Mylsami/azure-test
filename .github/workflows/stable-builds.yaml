@@ -77,6 +77,7 @@ jobs:
             touch "./${buildfile}"
           else
             aws s3 cp s3://${{steps.vars.outputs.STABLE_BUILDS_METADATA_S3_BUCKET}}/${{steps.vars.outputs.STABLE_BUILDS_METADATA_PATH}}/$buildfile $buildfile
+          fi
 
           IFS="," read -a components <<< "${{ github.event.inputs.components }}"
           IFS="," read -a tags <<< "${{ github.event.inputs.tags }}"
@@ -90,7 +91,7 @@ jobs:
               echo "${components[${cindex}]}: ${tag[${cindex}]}" >> $buildfile
             else
               echo "tag for ${components[${cindex}]} present in deploy file changing it"
-              sed -i "s/^${components[${cindex}]}:.*/${components[${cindex}]}: ${tag[${cindex}]}/g" $buildfile
+              sed -i "s/^${components[${cindex}]}:.*/${components[${cindex}]}: ${tags[${cindex}]}/g" $buildfile
             fi
           done
 
