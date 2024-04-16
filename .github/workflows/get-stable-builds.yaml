@@ -1,4 +1,4 @@
-name: Mark as Stable build
+name: Get stable builds
 on:
   workflow_dispatch:
     inputs:
