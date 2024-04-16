@@ -58,6 +58,7 @@ jobs:
         id: vars
         run: |
           cd ./pipelinescripts
+          ls
           chmod 777 deploy.env
           ./deploy.env
       - name: AWS login
