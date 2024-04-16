@@ -30,14 +30,6 @@ on:
           - 1101
           - 1100
 jobs:
-  Print-Details:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print Details
-        run: |
-          echo "Platform -- ${{ github.event.inputs.platform }}"
-          echo "Environment -- ${{ github.event.inputs.env }}"
-          echo "Current Version -- ${{ github.event.inputs.currentversion }}"
   Get-Stable-Builds:
     runs-on: ubuntu-latest
     steps:
@@ -67,5 +59,6 @@ jobs:
             echo "No stable builds found for the given platform, environment and version."
           else
             aws s3 cp s3://${{steps.vars.outputs.STABLE_BUILDS_METADATA_S3_BUCKET}}/${{steps.vars.outputs.STABLE_BUILDS_METADATA_PATH}}/$buildfile $buildfile
+            echo "===================================== $buildfile ====================================="
             cat $buildfile
           fi
