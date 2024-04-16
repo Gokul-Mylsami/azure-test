@@ -48,6 +48,7 @@ jobs:
           echo "Current Version -- ${{ github.event.inputs.currentversion }}"
   Mark-Stable-Builds:
     runs-on: [self-hosted, docker, BuildIO]
+    needs: [Print-Details]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -93,4 +94,3 @@ jobs:
           done
 
           aws s3 cp $buildfile s3://${{ steps.vars.outputs.STABLE_BUILDS_METADATA_S3_BUCKET }}/${{ steps.vars.outputs.STABLE_BUILDS_METADATA_PATH }}/$buildfile
-        needs: Print-Details
