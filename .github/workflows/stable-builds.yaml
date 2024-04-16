@@ -37,7 +37,7 @@ on:
           - 1100
 jobs:
   Print-Details:
-    runs-on: [self-hosted, docker, BuildIO]
+    runs-on: ubuntu-latest
     steps:
       - name: Print Details
         run: |
@@ -47,8 +47,8 @@ jobs:
           echo "Tags -- ${{ github.event.inputs.tags }}"
           echo "Current Version -- ${{ github.event.inputs.currentversion }}"
   Mark-Stable-Builds:
-    runs-on: [self-hosted, docker, BuildIO]
     needs: [Print-Details]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
