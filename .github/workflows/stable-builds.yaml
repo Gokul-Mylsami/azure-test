@@ -1,0 +1,95 @@
+name: Mark as Stable build
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Platform (aws,azure)"
+        required: true
+        type: choice
+        options:
+          - aws
+          - azure
+        default: aws
+      env:
+        description: "Environment(dev,int,stage,spro)"
+        required: true
+        type: choice
+        options:
+          - dev
+          - int
+          - stage
+          - spro
+        default: dev
+      components:
+        description: "Components for marking it as stable"
+        required: true
+      tags:
+        description: "Tags for images to be marked as stable, given in the order provided in the components."
+        required: true
+      currentversion:
+        description: "Current Major Release Version"
+        required: true
+        type: choice
+        options:
+          - 1104
+          - 1103
+          - 1101
+          - 1100
+jobs:
+  Print-Details:
+    runs-on: [self-hosted, docker, BuildIO]
+    steps:
+      - name: Print Details
+        run: |
+          echo "Platform -- ${{ github.event.inputs.platform }}"
+          echo "Environment -- ${{ github.event.inputs.env }}"
+          echo "Components -- ${{ github.event.inputs.components }}"
+          echo "Tags -- ${{ github.event.inputs.tags }}"
+          echo "Current Version -- ${{ github.event.inputs.currentversion }}"
+  Mark-Stable-Builds:
+    runs-on: [self-hosted, docker, BuildIO]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: ./pipelinescripts
+      - name: Apply Env File
+        id: vars
+        run: |
+          cd ./pipelinescripts
+          chmod 777 deploy.env
+          ./deploy.env
+      - name: AWS login
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_DEV_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_DEV_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_DEV_REGION }}
+      - name: Mark as Stable Build
+        run: |
+          buildfile="${{ github.event.inputs.platform }}-${{ github.event.inputs.env }}-${{ github.event.inputs.currentversion }}-stablebuilds.txt"
+
+          env_filepresent=$(aws s3 ls s3://${{steps.vars.outputs.STABLE_BUILDS_METADATA_S3_BUCKET}}/${{steps.vars.outputs.STABLE_BUILDS_METADATA_PATH}}/$buildfile || true)
+          if [[ "$env_filepresent" == "" ]]
+          then
+            touch "./${buildfile}"
+          else
+            aws s3 cp s3://${{steps.vars.outputs.STABLE_BUILDS_METADATA_S3_BUCKET}}/${{steps.vars.outputs.STABLE_BUILDS_METADATA_PATH}}/$buildfile $buildfile
+
+          IFS="," read -a components <<< "${{ github.event.inputs.components }}"
+          IFS="," read -a tags <<< "${{ github.event.inputs.tags }}"
+
+          for cindex in ${!components[@]}
+          do
+            tag_present=`sed -n "/^${components[${cindex}]}:.*/p" $buildfile || true`
+            if [[ "$tag_present" = "" ]]
+            then
+              echo "tag for ${components[${cindex}]} not present in stable build file adding it"
+              echo "${components[${cindex}]}: ${tag[${cindex}]}" >> $buildfile
+            else
+              echo "tag for ${components[${cindex}]} present in deploy file changing it"
+              sed -i "s/^${components[${cindex}]}:.*/${components[${cindex}]}: ${tag[${cindex}]}/g" $buildfile
+            fi
+          done
+
+          aws s3 cp $buildfile s3://${{ steps.vars.outputs.STABLE_BUILDS_METADATA_S3_BUCKET }}/${{ steps.vars.outputs.STABLE_BUILDS_METADATA_PATH }}/$buildfile
