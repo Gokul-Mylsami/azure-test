@@ -14,6 +14,7 @@ jobs:
   Mark-Stable-Builds:
     needs: [Print-Details]
     runs-on: ubuntu-latest
+    if: needs.Print-Details.outputs.CURRENT_VERSION != ''
     steps:
       - name: Print
         run: |
