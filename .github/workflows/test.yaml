@@ -1,4 +1,4 @@
-name: Mark as Stable build
+name: Testing
 on: workflow_dispatch
 jobs:
   Print-Details:
