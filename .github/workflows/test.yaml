@@ -1,0 +1,20 @@
+name: Mark as Stable build
+on: workflow_dispatch
+jobs:
+  Print-Details:
+    runs-on: ubuntu-latest
+    outputs:
+      CURRENT_VERSION: ${{ steps.vars.outputs.CURRENT_VERSION }}
+    steps:
+      - name: Print Details
+        id: vars
+        run: |
+          currentversion="1104"
+          echo "CURRENT_VERSION=${currentversion}" >> $GITHUB_OUTPUT
+  Mark-Stable-Builds:
+    needs: [Print-Details]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print
+        run: |
+          echo "Current Version: ${{ needs.Print-Details.outputs.CURRENT_VERSION }}"
