@@ -18,7 +18,7 @@ jobs:
       - name: Batch logic
         id: batch_logic
         run: |
-          BATCH_ARRAY='["1", "2", "3", "4", "5"]'
+          BATCH_ARRAY='["abc,def", "ghi,jkl", "mno,pqr"]'
           echo "BATCH_ARRAY=$BATCH_ARRAY" >> $GITHUB_OUTPUT
 
   build:
