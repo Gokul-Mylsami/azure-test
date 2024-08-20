@@ -27,6 +27,7 @@ jobs:
     strategy:
       matrix:
         batch_array: ${{ fromJson(needs.batch_logic.outputs.batch_array) }}
+      max-parallel: 1
     steps:
       - name: Run tests
         run: |
