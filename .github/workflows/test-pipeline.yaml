@@ -13,12 +13,13 @@ jobs:
   batch_logic:
     runs-on: ubuntu-latest
     outputs:
-      batch_array: ${{ steps.batch_logic.outputs.BATCH_ARRAY }}
+      batch_array: ${{ steps.batch-logic.outputs.batch_array }}
     steps:
       - name: Batch logic
         id: batch-logic
         run: |
           echo "BATCH_ARRAY=1,2,3,4,5" >> $GITHUB_OUTPUT
+
   build:
     runs-on: ubuntu-latest
     needs: batch_logic
